@@ -69,18 +69,6 @@
             bindings = <&to 0 &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
             label = "TO_LAYER_0";
         };
-
-        cmd_click: cmd_click {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            wait-ms = <0>;
-            bindings
-                = <&macro_press &kp LGUI>
-                , <&macro_tap &mkp MB1>
-                , <&macro_release &kp LGUI>
-                ;
-            label = "CMD_CLICK";
-        };
     };
 
     behaviors {
@@ -119,7 +107,7 @@
             bindings = <
 &trans  &trans  &trans  &trans  &trans                       &kp ESCAPE  &kp LC(J)       &trans  &trans           &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans   &kp LC(U)   &kp LC(LS(TAB))  &kp UP_ARROW  &kp LC(TAB)  &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans   &kp LC(LSHFT)  &kp LEFT_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW  &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LC(V)   &kp LC(LSHFT)  &kp LEFT_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans   &trans                                                       &trans
             >;
         };
@@ -146,7 +134,7 @@
 
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &cmd_click  &trans    &kp LG(LS(V))  &trans
+&trans  &trans  &trans  &trans  &trans                      &trans  &kp LGUI    &trans    &kp LG(LS(V))  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB1  &mkp MB3  &mkp MB2  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LG(LS(NUMBER_4))  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
