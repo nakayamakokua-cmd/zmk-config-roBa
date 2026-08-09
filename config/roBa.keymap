@@ -100,7 +100,7 @@
 &kp LCTRL         &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_layer_0 6 INT_HENKAN  &lt 2 SPACE  &lt_to_layer_0 3 INT_MUHENKAN      &kp BACKSPACE  &lt 3 ENTER                             &lt 1 RIGHT_ALT
             >;
 
-            sensor-bindings = <&scroll_encoder>;
+            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;   // A/Bテスト: &msc版が無反応のため一時的に旧PageUp/Downへ(2026-08-09)
         };
 
         FUNCTION {
