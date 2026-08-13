@@ -117,7 +117,7 @@
         default_layer {
             bindings = <
 &kp Q      &kp W              &kp E         &kp R      &kp T                                             &kp Y          &kp U        &lt 5 I  &kp O      &kp P
-&kp A      &kp S              &kp D         &kp F      &kp G        &kp LS(LG(S))                        &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp SQT
+&kp A      &kp S              &kp D         &kp F      &kp G        &kp F13                              &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp SQT
 &kp Z      &kp X              &kp C         &kp V      &kp B        &kp COLON                            &kp LC(SPACE)  &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
 &kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp LGUI   &lt 7 SPACE  &lt 8 RGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
@@ -197,12 +197,12 @@
             >;
         };
 
-        // ENCODER: 無変換位置(Right Command)の長押し中。
-        //   エンコーダ回転 = 音量上下 / エンコーダ押し込み(📷位置) = F13
+        // ENCODER: 無変換位置(Right Command)の長押し中。回転 = 音量上下。
+        //   押し込みは Default 層で常時F13にしたので、この層では &trans で素通し(2026-08-14)。
         ENCODER {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                        &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &kp F13       &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans        &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans        &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans        &trans  &trans                          &trans
             >;
