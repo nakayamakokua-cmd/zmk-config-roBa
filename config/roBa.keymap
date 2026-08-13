@@ -1,4 +1,6 @@
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 80
+// 160 = tap-ms短縮(40→25ms)で1目盛りあたりの発火が2回→1回に減るぶんの補正。
+// 1発火の移動量 = この値 × trigger-period-ms(既定16) / 1000 = 2.56 → 従来の2回ぶんと同等。
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 160
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
@@ -95,17 +97,29 @@
         };
 
         // エンコーダでマウスホイールスクロール。
-        // ✅ 2026-08-14 実機で動作確認 → Default層へ昇格済。
-        // 2026-08-09に無反応だった真因 = tap-ms未指定(既定5ms)で
-        // &msc の押下→解放が1tick内に収まり、スクロール量が1度も出力されなかった。
-        // tap-ms=40 で押下を保持してから解放させることで解決。
-        // 🔴 この値を下げると無言で効かなくなる（エラーは出ない）ので注意。
+        //
+        // 🔴 tap-ms は「短すぎると効かない・長すぎると固まる」の両側に崖がある。25が現行の着地点。
+        //
+        //  下側の崖(5ms=既定): &msc は trigger-period-ms(既定16ms)ごとにしか発火しないので、
+        //    押下→解放が16msより短いと一度も出力されない。2026-08-09〜08-14の無反応はこれ。
+        //  上側の崖(40ms): sensor-rotate は1目盛りごとに共有の behavior queue へ
+        //    「押す(wait=tap-ms)」「離す(wait=0)」を積む。行列は直列処理なので
+        //    1目盛りが tap-ms ぶん行列を占有し、40msだと毎秒25目盛りしか捌けない。
+        //    triggers-per-rotation=10 なので毎秒2.5回転を超えると行列が伸び、
+        //    溢れると zmk_behavior_queue_add の戻り値は捨てられるため黙って落ちる。
+        //    「押す」が先に積まれるので境界では【離すだけが消え】、&msc の速度が
+        //    ゼロに戻らず永久スクロールになる(2026-08-14に実機で発生)。
+        //
+        // 対策: tap-ms=25(16ms周期を1回だけ跨ぐ最小付近) + queue 64→256(roBa_R.conf)
+        //       これは穴を塞ぐのではなく余裕を約6倍に広げる対処。極端な高速回転では理屈上まだ再発しうる。
+        //       確実に固めたくない場合の唯一の安全策は &inc_dec_kp PG_UP PG_DN へ戻すこと。
+        // 復旧方法: 固まったら電源スイッチOFF→ON(内部の速度状態が消える)。
         scroll_encoder: scroll_encoder {
             compatible = "zmk,behavior-sensor-rotate";
             label = "SCROLL_ENCODER";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
-            tap-ms = <40>;
+            tap-ms = <25>;
         };
     };
 
@@ -124,8 +138,8 @@
 &kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp LGUI   &lt 7 SPACE  &lt 8 RGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
 
-            // 2026-08-14: tap-ms=40 でマウスホイール化が実機で動作したため、
-            // 暫定運用だったPageUp/Downから本来の狙いであるスクロールへ昇格。
+            // 2026-08-14: マウスホイール化が動作したため PageUp/Down から昇格。
+            // 同日、高速回転で永久スクロールになる不具合を回収し tap-ms を 40→25 に。詳細は behaviors 側のコメント。
             sensor-bindings = <&scroll_encoder>;
         };
 
