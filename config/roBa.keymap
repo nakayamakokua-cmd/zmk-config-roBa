@@ -62,6 +62,19 @@
         };
     };
 
+    // layer_6(BT設定・ブートローダー)の入口。
+    // 旧: 変換キー長押し → 変換位置をLeft Commandにしたため廃止(2026-08-13)。
+    // 新: Del位置(→layer1) と Enter(→layer3) を両方200ms以上ホールドすると layer_6 が出る。
+    //     右手だけで完結するので、左手が故障していてもブートローダーに入れる。
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+
+        sys_layer {
+            if-layers = <1 3>;
+            then-layer = <6>;
+        };
+    };
+
     macros {
         to_layer_0: to_layer_0 {
             compatible = "zmk,behavior-macro-one-param";
@@ -81,26 +94,35 @@
             tapping-term-ms = <200>;
         };
 
+        // エンコーダでマウスホイールスクロール。
+        // 2026-08-09に無反応だった原因の本命 = tap-ms未指定(既定5ms)で
+        // &msc の押下→解放が1tick内に収まり、スクロール量が1度も出力されない点。
+        // tap-ms=40 で押下を保持してから解放させる。SCROLL層(Iキー長押し)で実地検証中。
         scroll_encoder: scroll_encoder {
             compatible = "zmk,behavior-sensor-rotate";
             label = "SCROLL_ENCODER";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
+            tap-ms = <40>;
         };
     };
 
     keymap {
         compatible = "zmk,keymap";
 
+        // 左手下段の変更(2026-08-13):
+        //   元Cmd位置 → Left Shift   /   変換位置 → Left Command   /   無変換位置 → Right Command(長押しでENCODER層)
+        //   Space → SYMBOL層(記号)   /   Z の長押しShiftは廃止(素のZ)
+        // 左右Commandのタップは BetterTouchTool 側で半角/英数の切替に割り当てて使う。
         default_layer {
             bindings = <
-&kp Q             &kp W         &kp E         &kp R                        &kp T                                                          &kp Y        &kp U  &lt 5 I    &kp O    &kp P
-&kp A             &kp S         &kp D         &kp F                        &kp G        &kp LS(LG(S))                      &kp MINUS      &kp H        &kp J  &kp K      &kp L    &kp SQT
-&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                        &kp B        &kp COLON                          &kp LC(SPACE)  &kp N        &kp M  &kp COMMA  &kp DOT  &lt 2 SLASH
-&kp LCTRL         &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_layer_0 6 INT_HENKAN  &lt 2 SPACE  &lt_to_layer_0 3 INT_MUHENKAN      &kp BACKSPACE  &lt 3 ENTER                             &lt 1 RIGHT_ALT
+&kp Q      &kp W              &kp E         &kp R      &kp T                                             &kp Y          &kp U        &lt 5 I  &kp O      &kp P
+&kp A      &kp S              &kp D         &kp F      &kp G        &kp LS(LG(S))                        &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp SQT
+&kp Z      &kp X              &kp C         &kp V      &kp B        &kp COLON                            &kp LC(SPACE)  &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
+&kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp LGUI   &lt 7 SPACE  &lt 8 RGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
 
-            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;   // A/Bテスト: &msc版が無反応のため一時的に旧PageUp/Downへ(2026-08-09)
+            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;   // 素の回転はPageUp/Down(実機で動作確認済み)
         };
 
         FUNCTION {
@@ -141,6 +163,8 @@
             >;
         };
 
+        // Iキー長押し中。ボール移動がスクロールになるのに合わせ、
+        // エンコーダ回転もマウスホイール化(tap-ms修正版の検証枠)。
         SCROLL {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                      &trans  &trans  &trans  &trans  &trans
@@ -148,8 +172,11 @@
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                          &trans
             >;
+
+            sensor-bindings = <&scroll_encoder>;
         };
 
+        // BT設定・ブートローダー。入口 = Del位置 と Enter の同時長押し(conditional_layers)
         layer_6 {
             bindings = <
 &bootloader  &trans        &trans        &trans        &trans                      &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
@@ -157,6 +184,30 @@
 &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &trans      &bootloader  &trans        &trans        &trans        &trans        &bt BT_CLR
 &trans  &trans        &trans        &trans        &trans  &trans      &trans       &trans                                                  &bt BT_CLR_ALL
             >;
+        };
+
+        // SYMBOL: 左手Space長押し中。左手だけで記号を出す層(2026-08-13新設)
+        //   W=!  E=?  R=@  D=(  F=)
+        SYMBOL {
+            bindings = <
+&trans  &kp EXCLAMATION  &kp QUESTION           &kp AT_SIGN             &trans                      &trans  &trans  &trans  &trans  &trans
+&trans  &trans           &kp LEFT_PARENTHESIS   &kp RIGHT_PARENTHESIS   &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans           &trans                 &trans                  &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans           &trans                 &trans                  &trans  &trans      &trans  &trans                          &trans
+            >;
+        };
+
+        // ENCODER: 無変換位置(Right Command)の長押し中。
+        //   エンコーダ回転 = 音量上下 / エンコーダ押し込み(📷位置) = F13
+        ENCODER {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                        &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &kp F13       &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans        &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans        &trans  &trans                          &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp C_VOLUME_UP C_VOLUME_DOWN>;
         };
     };
 };
