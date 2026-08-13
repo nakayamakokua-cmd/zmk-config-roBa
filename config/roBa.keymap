@@ -95,9 +95,11 @@
         };
 
         // エンコーダでマウスホイールスクロール。
-        // 2026-08-09に無反応だった原因の本命 = tap-ms未指定(既定5ms)で
-        // &msc の押下→解放が1tick内に収まり、スクロール量が1度も出力されない点。
-        // tap-ms=40 で押下を保持してから解放させる。SCROLL層(Iキー長押し)で実地検証中。
+        // ✅ 2026-08-14 実機で動作確認 → Default層へ昇格済。
+        // 2026-08-09に無反応だった真因 = tap-ms未指定(既定5ms)で
+        // &msc の押下→解放が1tick内に収まり、スクロール量が1度も出力されなかった。
+        // tap-ms=40 で押下を保持してから解放させることで解決。
+        // 🔴 この値を下げると無言で効かなくなる（エラーは出ない）ので注意。
         scroll_encoder: scroll_encoder {
             compatible = "zmk,behavior-sensor-rotate";
             label = "SCROLL_ENCODER";
@@ -122,7 +124,9 @@
 &kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp LGUI   &lt 7 SPACE  &lt 8 RGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
 
-            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;   // 素の回転はPageUp/Down(実機で動作確認済み)
+            // 2026-08-14: tap-ms=40 でマウスホイール化が実機で動作したため、
+            // 暫定運用だったPageUp/Downから本来の狙いであるスクロールへ昇格。
+            sensor-bindings = <&scroll_encoder>;
         };
 
         FUNCTION {
@@ -163,8 +167,8 @@
             >;
         };
 
-        // Iキー長押し中。ボール移動がスクロールになるのに合わせ、
-        // エンコーダ回転もマウスホイール化(tap-ms修正版の検証枠)。
+        // Iキー長押し中。ボール移動がスクロールになる。
+        // エンコーダ回転は2026-08-14にDefault層へ昇格したので、この層の個別指定は撤去。
         SCROLL {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                      &trans  &trans  &trans  &trans  &trans
@@ -172,8 +176,6 @@
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                          &trans
             >;
-
-            sensor-bindings = <&scroll_encoder>;
         };
 
         // BT設定・ブートローダー。入口 = Del位置 と Enter の同時長押し(conditional_layers)
@@ -188,13 +190,13 @@
             >;
         };
 
-        // SYMBOL: 左手Space長押し中。左手だけで記号を出す層(2026-08-13新設)
-        //   W=!  E=?  R=@  D=(  F=)
+        // SYMBOL: 左手Space長押し中。記号を出す層(2026-08-13新設)
+        //   W=!  E=?  R=@ / D=(  F=) / C=<  V=>   ぜんぶ左手で完結する
         SYMBOL {
             bindings = <
 &trans  &kp EXCLAMATION  &kp QUESTION           &kp AT_SIGN             &trans                      &trans  &trans  &trans  &trans  &trans
 &trans  &trans           &kp LEFT_PARENTHESIS   &kp RIGHT_PARENTHESIS   &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans           &trans                 &trans                  &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans           &kp LESS_THAN          &kp GREATER_THAN        &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans           &trans                 &trans                  &trans  &trans      &trans  &trans                          &trans
             >;
         };
