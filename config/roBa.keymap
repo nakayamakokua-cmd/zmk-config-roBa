@@ -127,9 +127,10 @@
         compatible = "zmk,keymap";
 
         // 左手下段(外側→内側): Ctrl / Shift / Alt / 右Cmd / Space / 左Cmd
-        //   2026-08-14に左右Cmdの位置を入れ替え(中山指示)。ENCODER層(音量)のトリガーは
-        //   右Cmdに紐づく仕掛けなので、右Cmdと一緒に変換位置へ移動した。
-        //   左Cmd(&kp)は押しっぱなし可=Cmd+C等の修飾用。右Cmd(&lt 8)は長押しで層が開くのでタップ専用。
+        //   2026-08-14に左右Cmdの位置を入れ替え、さらにENCODER層(音量)のトリガーを
+        //   いちばん内側=エンコーダに近い側(無変換位置)へ戻した(中山指示)。
+        //   🔴 押しっぱなしにできるのは【右Cmd(変換位置)】。Cmd+C等の修飾用途はこちらを使う。
+        //      左Cmd(無変換位置)は長押しでENCODER層が開くのでタップ専用。
         //   左右Commandのタップは BetterTouchTool 側で半角/英数の切替に割り当てて使う。
         //   Pの下(旧クォート)を伸ばし棒に変更。内側上の伸ばし棒は中山の指示で保留=当面2箇所ある。
         default_layer {
@@ -137,7 +138,7 @@
 &kp Q      &kp W              &kp E         &kp R      &kp T                                             &kp Y          &kp U        &lt 5 I  &kp O      &kp P
 &kp A      &kp S              &kp D         &kp F      &kp G        &kp F13                              &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp MINUS
 &kp Z      &kp X              &kp C         &kp V      &kp B        &kp COLON                            &kp LC(SPACE)  &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
-&kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &lt 8 RGUI &lt 7 SPACE  &kp LGUI                             &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
+&kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp RGUI   &lt 7 SPACE  &lt 8 LGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
 
             // 2026-08-14: マウスホイール化が動作したため PageUp/Down から昇格。
