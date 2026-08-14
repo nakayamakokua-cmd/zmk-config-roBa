@@ -132,12 +132,16 @@
         //   🔴 押しっぱなしにできるのは【右Cmd(変換位置)】。Cmd+C等の修飾用途はこちらを使う。
         //      左Cmd(無変換位置)は長押しでENCODER層が開くのでタップ専用。
         //   左右Commandのタップは BetterTouchTool 側で半角/英数の切替に割り当てて使う。
-        //   Pの下(旧クォート)を伸ばし棒に変更。内側上の伸ばし棒は中山の指示で保留=当面2箇所ある。
+        //   Pの下: クォート→伸ばし棒→【Ctrl+Space(IME切替)】へ再移設(2026-08-14)。伸ばし棒は内側上の1箇所に戻った。
+        //   🔴 右手内側の下(RC(3,7))は旧Ctrl+Space→【B】に変更。分割前は右手人差し指でBを打っていた癖に合わせる。
+        //      この位置は layer_6 で【右手ブートローダー】でもある(物理位置で固定)。
+        //      呼び方を『Ctrl+Space位置』→『Bの位置』に更新すること。手順書の記述も追随済み。
+        //   FUNCTION層(1)のPの位置に Alt+C を配置。Ghostty の keybind が /clear + Enter に展開する。
         default_layer {
             bindings = <
 &kp Q      &kp W              &kp E         &kp R      &kp T                                             &kp Y          &kp U        &lt 5 I  &kp O      &kp P
-&kp A      &kp S              &kp D         &kp F      &kp G        &kp F13                              &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp MINUS
-&kp Z      &kp X              &kp C         &kp V      &kp B        &kp COLON                            &kp LC(SPACE)  &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
+&kp A      &kp S              &kp D         &kp F      &kp G        &kp F13                              &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp LC(SPACE)
+&kp Z      &kp X              &kp C         &kp V      &kp B        &kp COLON                            &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
 &kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp RGUI   &lt 7 SPACE  &lt 8 LGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
 
@@ -148,7 +152,7 @@
 
         FUNCTION {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                       &kp ESCAPE  &kp LC(J)       &trans  &trans           &trans
+&trans  &trans  &trans  &trans  &trans                       &kp ESCAPE  &kp LC(J)       &trans  &trans           &kp LA(C)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans   &kp LC(U)   &kp LC(LS(TAB))  &kp LC(UP_ARROW)  &kp LC(TAB)  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LC(V)   &kp LC(LSHFT)  &kp LGUI  &kp F4  &kp TAB  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans   &trans                                                       &trans
