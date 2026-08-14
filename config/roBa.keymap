@@ -136,7 +136,11 @@
         //   🔴 右手内側の下(RC(3,7))は旧Ctrl+Space→【B】に変更。分割前は右手人差し指でBを打っていた癖に合わせる。
         //      この位置は layer_6 で【右手ブートローダー】でもある(物理位置で固定)。
         //      呼び方を『Ctrl+Space位置』→『Bの位置』に更新すること。手順書の記述も追随済み。
-        //   FUNCTION層(1)のPの位置に Alt+C を配置。Ghostty の keybind が /clear + Enter に展開する。
+        //   FUNCTION層(1): Pの位置=Alt+C(Ghosttyのkeybindが /clear + Enter に展開)
+        //                 Pのすぐ下=Alt+P(Claude Code内蔵のモデル選択を開く)
+        //   🔴 Del位置は &lt 1 RIGHT_ALT ＝ 長押しでレイヤーが開くので RightAlt を
+        //      押しっぱなしにはできない。右手だけで ⌥+英字 を出したい時は、こうして
+        //      レイヤー側に完成形(LA(x))を置くのが唯一の手。
         default_layer {
             bindings = <
 &kp Q      &kp W              &kp E         &kp R      &kp T                                             &kp Y          &kp U        &lt 5 I  &kp O      &kp P
@@ -153,7 +157,7 @@
         FUNCTION {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                       &kp ESCAPE  &kp LC(J)       &trans  &trans           &kp LA(C)
-&trans  &trans  &trans  &trans  &trans  &trans      &trans   &kp LC(U)   &kp LC(LS(TAB))  &kp LC(UP_ARROW)  &kp LC(TAB)  &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans   &kp LC(U)   &kp LC(LS(TAB))  &kp LC(UP_ARROW)  &kp LC(TAB)  &kp LA(P)
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LC(V)   &kp LC(LSHFT)  &kp LGUI  &kp F4  &kp TAB  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans   &trans                                                       &trans
             >;
