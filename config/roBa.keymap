@@ -62,6 +62,24 @@
             bindings = <&kp EQUAL>;
             key-positions = <24 25>;
         };
+
+        // 右手側の Tab / Shift+Tab (2026-08-19 中山指示。コンボを右手へ寄せる方針)
+        // 🔴 layers = <0> が必須。コンボは既定で全レイヤーに効くため、指定しないと
+        //    ボール操作で自動的に開く MOUSE層(4) でも発火し、J/K/L のクリックに混ざる。
+        //    Default層に限れば、ボールを触っている間はクリックのまま・手を止めれば Tab。
+        // Pの下を長押し(=Cmd) しながら J+K を叩くと ⌘Tab のアプリ切り替えになる。
+        //    Cmd保持はレイヤーを変えないので layers = <0> と両立する。
+        tab_right {
+            bindings = <&kp TAB>;
+            key-positions = <18 19>;
+            layers = <0>;
+        };
+
+        shift_tab_right {
+            bindings = <&kp LS(TAB)>;
+            key-positions = <19 20>;
+            layers = <0>;
+        };
     };
 
     // layer_6(BT設定・ブートローダー)の入口。
@@ -97,7 +115,13 @@
         };
 
         // ── 英字キーの長押しに機能を持たせる用(2026-08-19新設) ──────────────
-        // Z の長押し = Shift / A の長押し = Tab。ZもAも【左手小指】＝離すのが遅い指。
+        // Z の長押し = Shift。Z は【左手小指】＝離すのが遅い指。
+        // ⚠️ 同日の後段で A の長押し Tab は撤去した(素の &kp A へ)。理由:
+        //    中山の当初の狙いは ⌘Tab のアプリ切り替えだったが、⌘Tab は「Tabを何回も叩く」
+        //    操作なので「1回出すのに400ms」の hold-tap は構造的に向かない。
+        //    Shift+Tab も D+F コンボで足り、単発 Tab も S+D で足りる。
+        //    最頻出キーである A に誤爆の余地を残す理由が無くなったため撤去。
+        //    → 代わりに右手側へ J+K(Tab) / K+L(Shift+Tab) のコンボを新設した。
         //
         // 🔴 flavor = "tap-preferred" が今回の肝。中山の優先順位は
         //    「日常のタイピングを絶対に壊さない」＞「修飾キー操作の速さ」(2026-08-19明言)。
@@ -135,6 +159,34 @@
             #binding-cells = <2>;
             flavor = "tap-preferred";
             tapping-term-ms = <400>;
+            quick-tap-ms = <200>;
+        };
+
+        // Pの下(RC(1,11)) 用。タップ = Ctrl+Space(IME切替) / 長押し = 左Command。
+        // 2026-08-19 中山指示: MOUSE層の同じ位置が `&kp LGUI` なので、Default層でも
+        // 同じ位置を長押しCmdにして「ボールを触っていてもいなくても同じ指の動き」に揃える。
+        //
+        // 🔴 flavor は "balanced" でなければならない(alpha_hold の tap-preferred は使えない)。
+        //    tap-preferred は他キーの press 時点で tap を確定するため、Cmd を保持したまま
+        //    別のキーを打つ = 修飾キーとしての用途が成立しない(Ctrl+Space が出てしまう)。
+        //    balanced なら「他キーの押して離す」で hold 確定 → ⌘C / ⌘Tab が自然に効く。
+        //  誤爆の向き: Z/A と逆で「押したまま次を打つ」が正常な使い方なので、
+        //    ロール誤爆という概念がない。代わりに「単独でゆっくり押すと Cmd に化ける」側だけ
+        //    気にすればよく、それは tapping-term で調整する。
+        //
+        //   tapping-term-ms = 250 : IME切替は叩く操作(通常70-150ms)なので余裕を持たせた。
+        //                           🔴 IME切替が Cmd に化けるなら 250→350 に上げる。
+        //                              Cmd を出すのが遅いなら 250→200 に下げる。
+        //   quick-tap-ms  = 200   : 直前にタップしていたら必ず Ctrl+Space。
+        //                           切り替えすぎて即戻す時の連打を守る。
+        cmd_ime: cmd_ime {
+            compatible = "zmk,behavior-hold-tap";
+            label = "CMD_IME";
+            bindings = <&kp>, <&kp>;
+
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <250>;
             quick-tap-ms = <200>;
         };
 
@@ -184,19 +236,23 @@
         //      押しっぱなしにはできない。右手だけで ⌥+英字 を出したい時は、こうして
         //      レイヤー側に完成形(LA(x))を置くのが唯一の手。
         //
-        //   2026-08-19: 左手小指2キーに長押しの二役を追加(中山指示)。
+        //   2026-08-19: Z に長押しの二役を追加(中山指示)。実機で「かずや」の誤爆が
+        //     解消したことを確認済み。
         //     Z: タップ=Z / 長押し(400ms)=Shift (2026-08-13に廃止した &mt LEFT_SHIFT Z の
         //        復活。ただし当時の誤爆の原因だった判定方式は変えてある)
-        //     A: タップ=A / 長押し(400ms)=Tab  (S+D の同時押しコンボと並ぶ2つ目のTab入口)
-        //     🔴 どちらも「他のキーを押した瞬間に英字が確定する」方式(tap-preferred)。
-        //        長押しを出すには【そのキーだけを400ms握る】。理由は behaviors の alpha_hold。
-        //     🔴 長押しの中身は &kp TAB / &kp LEFT_SHIFT ＝「押しっぱなし」なので、
-        //        A を長く握り続けると macOS のキーリピートで Tab が2回3回と出る。
-        //        1回だけにしたくなったら hold 側を1回タップのマクロに差し替える。
+        //     🔴 「他のキーを押した瞬間に英字が確定する」方式(tap-preferred)。
+        //        長押しを出すには【Zだけを400ms握る】。理由は behaviors の alpha_hold。
+        //     A は同日に一度 Tab を載せたが撤去済み(理由は alpha_hold のコメント)。
+        //
+        //   2026-08-19: Pの下(idx21) を `&cmd_ime LGUI LC(SPACE)` に変更(中山指示)。
+        //     タップ=Ctrl+Space(IME切替・従来どおり) / 長押し=左Command。
+        //     MOUSE層の同じ位置が `&kp LGUI` なので、ボールを触っていてもいなくても
+        //     同じ指の動きで Cmd を保持できるように揃えた。
+        //     ⌘Tab は「Pの下を長押し + J+K を叩く」で右手だけで完結する。
         default_layer {
             bindings = <
 &kp Q                      &kp W           &kp E         &kp R     &kp T                                     &kp Y          &kp U        &lt 5 I  &kp O      &kp P
-&alpha_hold TAB A          &kp S           &kp D         &kp F     &kp G        &kp F13                      &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp LC(SPACE)
+&kp A                      &kp S           &kp D         &kp F     &kp G        &kp F13                      &kp MINUS      &kp H        &kp J    &kp K      &kp L    &cmd_ime LGUI LC(SPACE)
 &alpha_hold LEFT_SHIFT Z   &kp X           &kp C         &kp V     &kp B        &kp COLON                    &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
 &kp LCTRL                  &kp LEFT_SHIFT  &kp LEFT_ALT  &kp RGUI  &lt 7 SPACE  &lt 8 LGUI                   &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
@@ -238,7 +294,7 @@
         MOUSE {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LG(V))    &trans    &kp LG(LS(V))  &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &mkp MB4  &mkp MB1  &mkp MB3  &mkp MB2  &kp LGUI
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &kp LGUI
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LG(LS(NUMBER_4))  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
             >;
