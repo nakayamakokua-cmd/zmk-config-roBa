@@ -96,6 +96,48 @@
             tapping-term-ms = <200>;
         };
 
+        // ── 英字キーの長押しに機能を持たせる用(2026-08-19新設) ──────────────
+        // Z の長押し = Shift / A の長押し = Tab。ZもAも【左手小指】＝離すのが遅い指。
+        //
+        // 🔴 flavor = "tap-preferred" が今回の肝。中山の優先順位は
+        //    「日常のタイピングを絶対に壊さない」＞「修飾キー操作の速さ」(2026-08-19明言)。
+        //
+        //  なぜ balanced ではダメか(2026-08-13に &mt LEFT_SHIFT Z を廃止した理由そのもの):
+        //    balanced は「このキーを押している間に、別のキーが押されて離された」を見て
+        //    長押しと判定する。ローマ字入力では「ず(z→u)」「ざ(z→a)」で
+        //    Z押下 → U押下 → U解放 → Z解放 の順になることがあり(小指は離れるのが遅い)、
+        //    その瞬間に Shift 確定 → 「ず」が「U」になる。
+        //    中山の名前が「かずや」で毎回Zを打つため、この誤爆を実際に踏んでいた。
+        //    🔴 この経路は tapping-term-ms を伸ばしても防げない。
+        //       balanced は term 満了を待たずに「他キーの押して離す」だけで確定するため。
+        //       term が効くのは「単独で長く握る」経路のみ。ここを取り違えないこと。
+        //
+        //  tap-preferred は「他のキーが押された時点で、迷わず英字を出す」。
+        //    → 上のロール誤爆は【構造的に】起きなくなる。残る誤爆経路は
+        //      「そのキーだけを term 以上、他に触らず握ったまま止まる」1通りだけ。
+        //
+        //  失うもの: 修飾キーとしての即応性。Shift+C は「Zを400ms握ってからC」になる。
+        //    打鍵の流れの中で大文字を混ぜる用途には向かない。
+        //    → 従来どおりの独立した Shift キーが左手下段2番目に残っているので、そちらを使う。
+        //
+        // 設定値:
+        //   tapping-term-ms = 400 : これだけ握って初めて長押し確定。人間の通常の打鍵は
+        //                           1キー70〜200msなので、日常打鍵の2〜5倍のマージン。
+        //                           🔴 遅いと感じたら 400→300 に下げる(誤爆の余地は増える)。
+        //                              逆にまだ化けるなら 400→500 に上げる。
+        //   quick-tap-ms  = 200   : 直前に同じキーをタップしていたら必ず英字。
+        //                           「かずや」を打ち直す時の連打や、長押しリピートを守る。
+        alpha_hold: alpha_hold {
+            compatible = "zmk,behavior-hold-tap";
+            label = "ALPHA_HOLD";
+            bindings = <&kp>, <&kp>;
+
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <400>;
+            quick-tap-ms = <200>;
+        };
+
         // エンコーダでマウスホイールスクロール。
         //
         // 🔴 tap-ms は「短すぎると効かない・長すぎると固まる」の両側に崖がある。25が現行の着地点。
@@ -141,12 +183,22 @@
         //   🔴 Del位置は &lt 1 RIGHT_ALT ＝ 長押しでレイヤーが開くので RightAlt を
         //      押しっぱなしにはできない。右手だけで ⌥+英字 を出したい時は、こうして
         //      レイヤー側に完成形(LA(x))を置くのが唯一の手。
+        //
+        //   2026-08-19: 左手小指2キーに長押しの二役を追加(中山指示)。
+        //     Z: タップ=Z / 長押し(400ms)=Shift (2026-08-13に廃止した &mt LEFT_SHIFT Z の
+        //        復活。ただし当時の誤爆の原因だった判定方式は変えてある)
+        //     A: タップ=A / 長押し(400ms)=Tab  (S+D の同時押しコンボと並ぶ2つ目のTab入口)
+        //     🔴 どちらも「他のキーを押した瞬間に英字が確定する」方式(tap-preferred)。
+        //        長押しを出すには【そのキーだけを400ms握る】。理由は behaviors の alpha_hold。
+        //     🔴 長押しの中身は &kp TAB / &kp LEFT_SHIFT ＝「押しっぱなし」なので、
+        //        A を長く握り続けると macOS のキーリピートで Tab が2回3回と出る。
+        //        1回だけにしたくなったら hold 側を1回タップのマクロに差し替える。
         default_layer {
             bindings = <
-&kp Q      &kp W              &kp E         &kp R      &kp T                                             &kp Y          &kp U        &lt 5 I  &kp O      &kp P
-&kp A      &kp S              &kp D         &kp F      &kp G        &kp F13                              &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp LC(SPACE)
-&kp Z      &kp X              &kp C         &kp V      &kp B        &kp COLON                            &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
-&kp LCTRL  &kp LEFT_SHIFT     &kp LEFT_ALT  &kp RGUI   &lt 7 SPACE  &lt 8 LGUI                           &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
+&kp Q                      &kp W           &kp E         &kp R     &kp T                                     &kp Y          &kp U        &lt 5 I  &kp O      &kp P
+&alpha_hold TAB A          &kp S           &kp D         &kp F     &kp G        &kp F13                      &kp MINUS      &kp H        &kp J    &kp K      &kp L    &kp LC(SPACE)
+&alpha_hold LEFT_SHIFT Z   &kp X           &kp C         &kp V     &kp B        &kp COLON                    &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
+&kp LCTRL                  &kp LEFT_SHIFT  &kp LEFT_ALT  &kp RGUI  &lt 7 SPACE  &lt 8 LGUI                   &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
             >;
 
             // 2026-08-14: マウスホイール化が動作したため PageUp/Down から昇格。
@@ -216,13 +268,15 @@
         };
 
         // SYMBOL: 左手Space長押し中。記号を出す層(2026-08-13新設)
-        //   W=!  E=?  R=@ / D=(  F=) / C=<  V=>   ぜんぶ左手で完結する
+        //   Q=Esc  W=!  E=?  R=@  T=_ / D=(  F=) / C=<  V=>   ぜんぶ左手で完結する
+        //   2026-08-19: Q=Escape と T=アンダーバー を追加(中山指示)。
+        //   Escapeは記号ではないが「Space長押し中に左手小指ひとつで抜けられる」ことを優先。
         SYMBOL {
             bindings = <
-&trans  &kp EXCLAMATION  &kp QUESTION           &kp AT_SIGN             &trans                      &trans  &trans  &trans  &trans  &trans
-&trans  &trans           &kp LEFT_PARENTHESIS   &kp RIGHT_PARENTHESIS   &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans           &kp LESS_THAN          &kp GREATER_THAN        &trans  &trans      &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans           &trans                 &trans                  &trans  &trans      &trans  &trans                          &trans
+&kp ESCAPE  &kp EXCLAMATION  &kp QUESTION          &kp AT_SIGN            &kp UNDERSCORE                      &trans  &trans  &trans  &trans  &trans
+&trans      &trans           &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS  &trans          &trans      &trans  &trans  &trans  &trans  &trans  &trans
+&trans      &trans           &kp LESS_THAN         &kp GREATER_THAN       &trans          &trans      &trans  &trans  &trans  &trans  &trans  &trans
+&trans      &trans           &trans                &trans                 &trans          &trans      &trans  &trans                          &trans
             >;
         };
 
