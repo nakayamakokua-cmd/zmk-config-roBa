@@ -80,6 +80,17 @@
             key-positions = <19 20>;
             layers = <0>;
         };
+
+        // 右手だけでSpace(2026-08-27 中山指示)。M位置(30) + カンマ位置(31)。
+        // layers = <0> は必須。無指定だと全レイヤーに効くため、
+        //   ・MOUSE層(4): M=⌘C / カンマ=⌘V に混ざる(ボール操作で自動的に開く層)
+        //   ・NUM層(2)  : M=← / カンマ=↓ の同時押し(斜め移動)でSpaceが暴発
+        // ローマ字入力ではmの直後に必ず母音が来るので、m→カンマの連続打鍵は構造的に発生しない。
+        space_right {
+            bindings = <&kp SPACE>;
+            key-positions = <30 31>;
+            layers = <0>;
+        };
     };
 
     // layer_6(BT設定・ブートローダー)の入口。
@@ -262,19 +273,36 @@
             sensor-bindings = <&scroll_encoder>;
         };
 
+        // FUNCTION(1): Del位置の長押し中。2026-08-27に右手を全面再編(中山指示)。
+        //   J=Alt+N  K=Alt+S  L=Alt+Shift+N   ← ターミナル/エディタ側のキーバインド用
+        //   M=Ctrl+Shift(単体)  カンマ=Ctrl+U  ピリオド=Ctrl+J
+        //   Y=Escape  P=Alt+C(Ghostty経由で /clear)  Pの下=Alt+P(モデル選択)  B位置=Ctrl+V
+        // 🔴 この再編で消えた機能(意図的・中山指示の結果):
+        //   ・M位置の &kp LGUI(Cmd押しっぱなし) → レイヤー1経由の⌘Tab(M保持+ピリオド連打)が消滅。
+        //     代替はラウンド14で作った右手コンボ(Pの下を長押し=⌘ + J+K=Tab)。
+        //   ・J=Ctrl+Shift+Tab / L=Ctrl+Tab のタブ前後切替が両方消滅。
+        //     代替はRNUM層(Enter長押し)のエンコーダ回転=Ctrl+PageUp/Down。
+        //   ・K位置のMission Control と カンマ位置のF4(Launchpad) はNUM層(2)のO/L位置へ移設。
+        //   ・Ctrl+U はH位置から、Ctrl+J はU位置から移動(元の位置は素通しに戻した)。
         FUNCTION {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                       &kp ESCAPE  &kp LC(J)       &trans  &trans           &kp LA(C)
-&trans  &trans  &trans  &trans  &trans  &trans      &trans   &kp LC(U)   &kp LC(LS(TAB))  &kp LC(UP_ARROW)  &kp LC(TAB)  &kp LA(P)
-&trans  &trans  &trans  &trans  &trans  &trans      &kp LC(V)   &kp LC(LSHFT)  &kp LGUI  &kp F4  &kp TAB  &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans   &trans                                                       &trans
+&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &trans         &trans     &trans        &kp LA(C)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans      &kp LA(N)      &kp LA(S)  &kp LA(LS(N))  &kp LA(P)
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LC(V)  &trans   &kp LC(LSHFT)  &kp LC(U)  &kp LC(J)      &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                               &trans
             >;
         };
 
+        // NUM(2): スラッシュ位置の長押し中。右手は矢印+記号。
+        //   2026-08-27: レイヤー1から追い出したウィンドウ操作をここへ移設(中山指示)。
+        //     O位置: "(" → Mission Control(Ctrl+↑)
+        //     L位置: "$" → F4(Launchpad)
+        //   🔴 代償: "(" はSYMBOL層(Space長押し)のD位置に同じものが残るが、
+        //      "$" はこの位置が唯一だったのでキーボードから消えた。
         NUM {
             bindings = <
-&kp MINUS                   &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp PLUS                                                   &kp CARET         &kp LG(LS(T))      &kp TILDE       &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS
-&kp SLASH                   &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp ASTERISK  &kp LC(LA(KP_NUMBER_0))      &kp UNDERSCORE  &kp EXCLAMATION   &kp LG(W)          &kp UP_ARROW      &kp DOLLAR            &kp PERCENT
+&kp MINUS                   &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp PLUS                                                   &kp CARET         &kp LG(LS(T))      &kp TILDE       &kp LC(UP_ARROW)      &kp RIGHT_PARENTHESIS
+&kp SLASH                   &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp ASTERISK  &kp LC(LA(KP_NUMBER_0))      &kp UNDERSCORE  &kp EXCLAMATION   &kp LG(W)          &kp UP_ARROW      &kp F4                &kp PERCENT
 &mt LEFT_SHIFT KP_NUMBER_0  &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp PERIOD    &kp EQUAL                    &trans          &kp LEFT_BRACKET  &kp LEFT_ARROW     &kp DOWN_ARROW      &kp RIGHT_ARROW     &kp BACKSLASH
 &trans                      &trans           &trans           &trans           &trans        &trans                       &trans          &trans                                                                     &kp PIPE
             >;
