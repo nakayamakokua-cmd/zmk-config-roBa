@@ -274,7 +274,7 @@
         };
 
         // FUNCTION(1): Del位置の長押し中。2026-08-27に右手を全面再編(中山指示)。
-        //   上段: Y=Escape  U=Alt+R  I=Alt+F  P=Alt+C(Ghostty経由で /clear)
+        //   上段: Y=Escape  U=Alt+R  I=Alt+F  O=Alt+W  P=Alt+C(Ghostty経由で /clear)
         //   中段: J=Alt+N   K=Alt+S  L=Alt+Shift+N   Pの下=Alt+P(モデル選択)
         //   下段: N=Ctrl+V  M=Ctrl+Shift(単体)  カンマ=Ctrl+U  ピリオド=Ctrl+J
         //   ※ Alt系はターミナル/エディタ側のキーバインド用。レイヤーの入口キーは
@@ -290,7 +290,7 @@
         //   ・Ctrl+U はH位置から、Ctrl+J はU位置から移動(元の位置は素通しに戻した)。
         FUNCTION {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &kp LA(R)   &kp LA(F)      &trans     &kp LA(C)
+&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &kp LA(R)   &kp LA(F)      &kp LA(W)  &kp LA(C)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans      &kp LA(N)      &kp LA(S)  &kp LA(LS(N))  &kp LA(P)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(V)   &kp LC(LSHFT)  &kp LC(U)  &kp LC(J)      &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                               &trans
