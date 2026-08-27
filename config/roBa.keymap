@@ -336,11 +336,12 @@
         //   idx16(伸ばし棒) = ⌘⇧V(書式なし貼り付け)。idx8(O)から移設。
         //   idx28(B位置)   = ⌘⇧4(範囲スクショ)。idx29(N)から移設。
         //   idx6(U)        = ⌃⌘V を削除(使っていない)。
+        //   idx29(N)       = &trans → **&kp LC(V)**(Ctrl+V)。⌘⇧4をB位置へ移して空いた場所。
         MOUSE {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                      &mkp MB5  &trans    &trans    &trans     &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &kp LGUI
-&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &trans  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &kp LC(V)  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
             >;
         };
