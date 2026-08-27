@@ -324,20 +324,22 @@
         };
 
         // MOUSE(4): ボールを触ると自動で開く。2026-08-27に中山指示で整理。
-        //   idx21(Pの下) = &kp LGUI → **&mkp MB5(進む)**
-        //     🔴 理由: Default層のこの位置は「叩く=IME切替 / 長押し=⌘」だが、MOUSE層が
-        //        開いている間はMOUSE層の定義が優先されるため【押した瞬間に⌘】になり、
-        //        ボールを触った直後にIME切替しようとすると⌘が暴発していた(中山の実感)。
-        //     🔴 代償: ボール操作中に⌘を保持する手段がこの位置から消えた。
-        //        ⌘クリック(新しいタブで開く)は【左手のCmd(変換位置=右Cmd・押しっぱなし可)】
-        //        を使うこと。H=戻る(MB4) と対になって進む/戻るが揃う。
+        //   idx21(Pの下) = &kp LGUI のまま【据え置き】。
+        //     🔴 一度 &mkp MB5(進む) にしたが、焼く前に中山判断で撤回した(2026-08-27)。
+        //        理由: ボール操作中に⌘を保持できなくなるのが痛い(⌘クリック=新しいタブで開く)。
+        //        MOUSE層が開いている間はMOUSE層の定義が優先されるため、この位置を
+        //        MB5にすると Default層の hold-tap(長押し=⌘) は一切効かなくなる。
+        //     ※ ボールを触った直後のIME切替が⌘に化ける件は未解決のまま残る
+        //        (この位置はMOUSE層では【押した瞬間に⌘】になるため)。
+        //   idx5(Y) = &trans → **&mkp MB5(進む)**。空いていた位置へ移した。
+        //     H=戻る(MB4) とは離れた位置になるが、⌘を残すことを優先した。
         //   idx16(伸ばし棒) = ⌘⇧V(書式なし貼り付け)。idx8(O)から移設。
         //   idx28(B位置)   = ⌘⇧4(範囲スクショ)。idx29(N)から移設。
         //   idx6(U)        = ⌃⌘V を削除(使っていない)。
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &mkp MB5
+&trans  &trans  &trans  &trans  &trans                      &mkp MB5  &trans    &trans    &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &kp LGUI
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &trans  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
             >;
