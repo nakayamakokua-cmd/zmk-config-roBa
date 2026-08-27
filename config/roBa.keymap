@@ -274,9 +274,13 @@
         };
 
         // FUNCTION(1): Del位置の長押し中。2026-08-27に右手を全面再編(中山指示)。
-        //   J=Alt+N  K=Alt+S  L=Alt+Shift+N   ← ターミナル/エディタ側のキーバインド用
-        //   M=Ctrl+Shift(単体)  カンマ=Ctrl+U  ピリオド=Ctrl+J
-        //   Y=Escape  P=Alt+C(Ghostty経由で /clear)  Pの下=Alt+P(モデル選択)  B位置=Ctrl+V
+        //   上段: Y=Escape  U=Alt+R  I=Alt+F  P=Alt+C(Ghostty経由で /clear)
+        //   中段: J=Alt+N   K=Alt+S  L=Alt+Shift+N   Pの下=Alt+P(モデル選択)
+        //   下段: N=Ctrl+V  M=Ctrl+Shift(単体)  カンマ=Ctrl+U  ピリオド=Ctrl+J
+        //   ※ Alt系はターミナル/エディタ側のキーバインド用。レイヤーの入口キーは
+        //     修飾キーとして押しっぱなしにできないため、完成形(LA(x))を層に置くのが唯一の手。
+        //   ※ 2026-08-27の後段でさらに移動: Ctrl+V を B位置(idx28)→N位置(idx29)へ。
+        //     B位置は空けた(MOUSE層で同じ位置に⌘⇧4を置いたので、指の記憶を衝突させない)。
         // 🔴 この再編で消えた機能(意図的・中山指示の結果):
         //   ・M位置の &kp LGUI(Cmd押しっぱなし) → レイヤー1経由の⌘Tab(M保持+ピリオド連打)が消滅。
         //     代替はラウンド14で作った右手コンボ(Pの下を長押し=⌘ + J+K=Tab)。
@@ -286,9 +290,9 @@
         //   ・Ctrl+U はH位置から、Ctrl+J はU位置から移動(元の位置は素通しに戻した)。
         FUNCTION {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &trans         &trans     &trans        &kp LA(C)
+&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &kp LA(R)   &kp LA(F)      &trans     &kp LA(C)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans      &kp LA(N)      &kp LA(S)  &kp LA(LS(N))  &kp LA(P)
-&trans  &trans  &trans  &trans  &trans  &trans      &kp LC(V)  &trans   &kp LC(LSHFT)  &kp LC(U)  &kp LC(J)      &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(V)   &kp LC(LSHFT)  &kp LC(U)  &kp LC(J)      &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                               &trans
             >;
         };
@@ -319,11 +323,22 @@
             sensor-bindings = <&inc_dec_kp LC(PAGE_UP) LC(PAGE_DOWN)>;
         };
 
+        // MOUSE(4): ボールを触ると自動で開く。2026-08-27に中山指示で整理。
+        //   idx21(Pの下) = &kp LGUI → **&mkp MB5(進む)**
+        //     🔴 理由: Default層のこの位置は「叩く=IME切替 / 長押し=⌘」だが、MOUSE層が
+        //        開いている間はMOUSE層の定義が優先されるため【押した瞬間に⌘】になり、
+        //        ボールを触った直後にIME切替しようとすると⌘が暴発していた(中山の実感)。
+        //     🔴 代償: ボール操作中に⌘を保持する手段がこの位置から消えた。
+        //        ⌘クリック(新しいタブで開く)は【左手のCmd(変換位置=右Cmd・押しっぱなし可)】
+        //        を使うこと。H=戻る(MB4) と対になって進む/戻るが揃う。
+        //   idx16(伸ばし棒) = ⌘⇧V(書式なし貼り付け)。idx8(O)から移設。
+        //   idx28(B位置)   = ⌘⇧4(範囲スクショ)。idx29(N)から移設。
+        //   idx6(U)        = ⌃⌘V を削除(使っていない)。
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LG(V))    &trans    &kp LG(LS(V))  &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &kp LGUI
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LG(LS(NUMBER_4))  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
+&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &mkp MB5
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &trans  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
             >;
         };
