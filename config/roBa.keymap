@@ -99,7 +99,10 @@
 
     // layer_6(BT設定・ブートローダー)の入口。
     // 旧: 変換キー長押し → 変換位置をLeft Commandにしたため廃止(2026-08-13)。
-    // 新: Del位置(→layer1) と Enter(→layer3) を両方200ms以上ホールドすると layer_6 が出る。
+    // 旧2: Del位置(→layer1) + Enter(→layer3) の同時長押し(2026-08-13〜2026-09-01)。
+    // 現行: 🔴 スラッシュ位置(→layer1) と Enter(→layer3) を両方200ms以上ホールド。
+    //     2026-09-01にlayer1の入口をDel位置→スラッシュへ移したため、ここも連動して変わった
+    //     (判定は「レイヤー1と3が同時に開いている」なので、物理キーはlayer1/3の入口に追随する)。
     //     右手だけで完結するので、左手が故障していてもブートローダーに入れる。
     conditional_layers {
         compatible = "zmk,conditional-layers";
@@ -177,6 +180,8 @@
             quick-tap-ms = <200>;
         };
 
+        // 🔴 2026-09-01から未使用(Pの下を &lt 2 LC(SPACE) に変更したため)。定義は残す:
+        //    MOUSE層のPの下(素の&kp LGUI)を「叩く=IME/長押し=⌘」に揃えたくなった時の再利用候補。
         // Pの下(RC(1,11)) 用。タップ = Ctrl+Space(IME切替) / 長押し = 左Command。
         // 2026-08-19 中山指示: MOUSE層の同じ位置が `&kp LGUI` なので、Default層でも
         // 同じ位置を長押しCmdにして「ボールを触っていてもいなくても同じ指の動き」に揃える。
@@ -247,9 +252,9 @@
         //      呼び方を『Ctrl+Space位置』→『Bの位置』に更新すること。手順書の記述も追随済み。
         //   FUNCTION層(1): Pの位置=Alt+C(Ghosttyのkeybindが /clear + Enter に展開)
         //                 Pのすぐ下=Alt+P(Claude Code内蔵のモデル選択を開く)
-        //   🔴 Del位置は &lt 1 RIGHT_ALT ＝ 長押しでレイヤーが開くので RightAlt を
-        //      押しっぱなしにはできない。右手だけで ⌥+英字 を出したい時は、こうして
-        //      レイヤー側に完成形(LA(x))を置くのが唯一の手。
+        //   ⛔ 2026-09-01で解消 〜旧: Del位置は &lt 1 RIGHT_ALT ＝ RightAltを押しっぱなしに
+        //      できない〜 → Del位置を素の &kp RIGHT_ALT に変更したため押しっぱなし可能になった。
+        //      レイヤー1の完成形(LA(x))キーは残置(慣れた操作を先に消さない)。
         //
         //   2026-08-19: Z に長押しの二役を追加(中山指示)。実機で「かずや」の誤爆が
         //     解消したことを確認済み。
@@ -264,12 +269,24 @@
         //     MOUSE層の同じ位置が `&kp LGUI` なので、ボールを触っていてもいなくても
         //     同じ指の動きで Cmd を保持できるように揃えた。
         //     ⌘Tab は「Pの下を長押し + J+K を叩く」で右手だけで完結する。
+        //
+        //   🔴 2026-09-01(ラウンド19) 入口の大移動(中山指示):
+        //     ・Pの下 = &lt 2 LC(SPACE)。タップ=⌃Space(IME・従来どおり) / 長押し=NUM層(2)。
+        //       長押し⌘は廃止 → ⌘Tabの「Pの下+J+K」フローも消滅。代替=Oを0.4秒握って⌘+J+K。
+        //     ・スラッシュ = &lt 1 SLASH。長押しがNUM層→FUNCTION層(1)に変更。
+        //     ・Del位置 = 素の &kp RIGHT_ALT(押しっぱなし可能になった)。
+        //     ・O = &alpha_hold LGUI O。タップ=O / 0.4秒握る=⌘。
+        //       🔴 flavor は tap-preferred(Zと同じ)が必須。Oは母音で最頻出級のため、
+        //       balanced だとローマ字のロール(「ou」等)で ⌘U など破壊的誤爆が出る。
+        //       代償: ⌘コンボは「Oを0.4秒握ってから」。急ぐ時はボールに触れてMOUSE層の
+        //       Pの下(素の⌘)を使う。
+        //     ・layer_6(書き込みモード)の入口もスラッシュ+Enterに連動変更(conditional_layers参照)。
         default_layer {
             bindings = <
-&kp Q                      &kp W           &kp E         &kp R     &kp T                                     &kp Y          &kp U        &lt 5 I  &kp O      &kp P
-&kp A                      &kp S           &kp D         &kp F     &kp G        &kp F13                      &kp MINUS      &kp H        &kp J    &kp K      &kp L    &cmd_ime LGUI LC(SPACE)
-&alpha_hold LEFT_SHIFT Z   &kp X           &kp C         &kp V     &kp B        &kp COLON                    &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 2 SLASH
-&kp LCTRL                  &kp LEFT_SHIFT  &kp LEFT_ALT  &kp RGUI  &lt 7 SPACE  &lt 8 LGUI                   &kp BACKSPACE  &lt 3 ENTER                                &lt 1 RIGHT_ALT
+&kp Q                      &kp W           &kp E         &kp R     &kp T                                     &kp Y          &kp U        &lt 5 I  &alpha_hold LGUI O  &kp P
+&kp A                      &kp S           &kp D         &kp F     &kp G        &kp F13                      &kp MINUS      &kp H        &kp J    &kp K      &kp L    &lt 2 LC(SPACE)
+&alpha_hold LEFT_SHIFT Z   &kp X           &kp C         &kp V     &kp B        &kp COLON                    &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 1 SLASH
+&kp LCTRL                  &kp LEFT_SHIFT  &kp LEFT_ALT  &kp RGUI  &lt 7 SPACE  &lt 8 LGUI                   &kp BACKSPACE  &lt 3 ENTER                                &kp RIGHT_ALT
             >;
 
             // 2026-08-14: マウスホイール化が動作したため PageUp/Down から昇格。
@@ -277,7 +294,8 @@
             sensor-bindings = <&scroll_encoder>;
         };
 
-        // FUNCTION(1): Del位置の長押し中。2026-08-27に右手を全面再編(中山指示)。
+        // FUNCTION(1): 🔴 スラッシュ位置の長押し中(2026-09-01にDel位置長押しから移設)。
+        //   2026-08-27に右手を全面再編(中山指示)。
         //   上段: Y=Escape  U=Alt+R  I=Alt+F  O=Alt+W  P=Alt+C(Ghostty経由で /clear)
         //   中段: J=Alt+N   K=Alt+S  L=Alt+Shift+N   Pの下=Alt+P(モデル選択)
         //   下段: N=Ctrl+V  M=Ctrl+Shift(単体)  カンマ=Ctrl+U  ピリオド=Ctrl+J
@@ -301,17 +319,21 @@
             >;
         };
 
-        // NUM(2): スラッシュ位置の長押し中。右手は矢印+記号。
+        // NUM(2): 🔴 Pの下の長押し中(2026-09-01にスラッシュ長押しから移設)。
+        //   2026-09-01: 右手を再編(中山指示)。矢印を1段上げてホーム段の逆T字に:
+        //     I=↑ / J=← / K=↓ / L=→。U=Mission Control(⌃↑) / O=F4(Launchpad) /
+        //     M=⌘W(タブ閉じる) / カンマ=⌘⇧T(タブ復元)。
+        //     ~(チルダ)は↑に押し出されたため、空いたピリオド位置(idx32)へ退避(指示外・要報告)。
+        //   🔴 入口がPの下(idx21)になったので、この層のidx21(%)は押せない=死に機能。
+        //      %はRNUM層(Enter長押し)の同じ位置に生きているので実害なし。
         //   2026-08-27: レイヤー1から追い出したウィンドウ操作をここへ移設(中山指示)。
-        //     O位置: "(" → Mission Control(Ctrl+↑)
-        //     L位置: "$" → F4(Launchpad)
         //   🔴 代償: "(" はSYMBOL層(Space長押し)のD位置に同じものが残るが、
         //      "$" はこの位置が唯一だったのでキーボードから消えた。
         NUM {
             bindings = <
-&kp MINUS                   &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp PLUS                                                   &kp CARET         &kp LG(LS(T))      &kp TILDE       &kp LC(UP_ARROW)      &kp RIGHT_PARENTHESIS
-&kp SLASH                   &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp ASTERISK  &kp LC(LA(KP_NUMBER_0))      &kp UNDERSCORE  &kp EXCLAMATION   &kp LG(W)          &kp UP_ARROW      &kp F4                &kp PERCENT
-&mt LEFT_SHIFT KP_NUMBER_0  &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp PERIOD    &kp EQUAL                    &trans          &kp LEFT_BRACKET  &kp LEFT_ARROW     &kp DOWN_ARROW      &kp RIGHT_ARROW     &kp BACKSLASH
+&kp MINUS                   &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp PLUS                                                   &kp CARET         &kp LC(UP_ARROW)   &kp UP_ARROW    &kp F4                &kp RIGHT_PARENTHESIS
+&kp SLASH                   &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp ASTERISK  &kp LC(LA(KP_NUMBER_0))      &kp UNDERSCORE  &kp EXCLAMATION   &kp LEFT_ARROW     &kp DOWN_ARROW    &kp RIGHT_ARROW       &kp PERCENT
+&mt LEFT_SHIFT KP_NUMBER_0  &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp PERIOD    &kp EQUAL                    &trans          &kp LEFT_BRACKET  &kp LG(W)          &kp LG(LS(T))     &kp TILDE             &kp BACKSLASH
 &trans                      &trans           &trans           &trans           &trans        &trans                       &trans          &trans                                                                     &kp PIPE
             >;
         };
@@ -341,12 +363,16 @@
         //   idx28(B位置)   = ⌘⇧4(範囲スクショ)。idx29(N)から移設。
         //   idx6(U)        = ⌃⌘V を削除(使っていない)。
         //   idx29(N)       = &trans → **&kp LC(V)**(Ctrl+V)。⌘⇧4をB位置へ移して空いた場所。
+        //   2026-09-01: idx33(スラッシュ位置)=⌘Z(取り消し) / idx42(Del位置)=⌘⇧Z(やり直し)。
+        //     レイヤー入口キーの位置でも、MOUSE層が開いている間はMOUSE層の定義が優先される
+        //     ので普通に割り当てられる(Pの下=⌘と同じ仕組み)。ボールが止まって0.7秒経つと
+        //     MOUSE層が閉じ、同じキーが「/(長押しLayer1)」「RightAlt」に戻る点だけ注意。
         MOUSE {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                      &mkp MB5  &trans    &trans    &trans     &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &kp LGUI
-&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &kp LC(V)  &kp LG(C)  &kp LG(V)  &kp LG(X)  &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &kp LC(V)  &kp LG(C)  &kp LG(V)  &kp LG(X)  &kp LG(Z)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &kp LG(LS(Z))
             >;
         };
 
@@ -361,14 +387,15 @@
             >;
         };
 
-        // BT設定・ブートローダー。入口 = Del位置 と Enter の同時長押し(conditional_layers)
-        // 🔴 Del位置とEnterは「入口として押しっぱなしにしている」ため、この層では押せない=
+        // BT設定・ブートローダー。入口 = 🔴 スラッシュ位置 と Enter の同時長押し(2026-09-01変更)
+        // 🔴 スラッシュ位置とEnterは「入口として押しっぱなしにしている」ため、この層では押せない=
         //    そこに機能を置いてはいけない。BT_CLR_ALL は旧Del位置からBackSpace位置へ退避済(2026-08-14)。
+        //    BT_CLR(そのプロファイル解除)も同じ理由で 2026-09-01 にスラッシュ位置→ピリオド位置へ退避。
         layer_6 {
             bindings = <
 &bootloader  &trans        &trans        &trans        &trans                      &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
 &trans  &trans        &trans        &trans        &trans  &trans      &trans       &trans        &trans        &trans        &trans        &trans
-&trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &trans      &bootloader  &trans        &trans        &trans        &trans        &bt BT_CLR
+&trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &trans      &bootloader  &trans        &trans        &trans        &bt BT_CLR    &trans
 &trans  &trans        &trans        &trans        &trans  &trans      &bt BT_CLR_ALL  &trans                                               &trans
             >;
         };
