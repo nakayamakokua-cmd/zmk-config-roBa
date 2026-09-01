@@ -180,8 +180,8 @@
             quick-tap-ms = <200>;
         };
 
-        // 🔴 2026-09-01から未使用(Pの下を &lt 2 LC(SPACE) に変更したため)。定義は残す:
-        //    MOUSE層のPの下(素の&kp LGUI)を「叩く=IME/長押し=⌘」に揃えたくなった時の再利用候補。
+        // 🔴 2026-09-01から未使用(Pの下を &lt 2 LC(SPACE) に変更したため)。定義だけ残置
+        //    (同日R20でMOUSE層のPの下も⌘→進むに変わり、当初想定した再利用先も消えた)。
         // Pの下(RC(1,11)) 用。タップ = Ctrl+Space(IME切替) / 長押し = 左Command。
         // 2026-08-19 中山指示: MOUSE層の同じ位置が `&kp LGUI` なので、Default層でも
         // 同じ位置を長押しCmdにして「ボールを触っていてもいなくても同じ指の動き」に揃える。
@@ -278,8 +278,8 @@
         //     ・O = &alpha_hold LGUI O。タップ=O / 0.4秒握る=⌘。
         //       🔴 flavor は tap-preferred(Zと同じ)が必須。Oは母音で最頻出級のため、
         //       balanced だとローマ字のロール(「ou」等)で ⌘U など破壊的誤爆が出る。
-        //       代償: ⌘コンボは「Oを0.4秒握ってから」。急ぐ時はボールに触れてMOUSE層の
-        //       Pの下(素の⌘)を使う。
+        //       代償: ⌘コンボは「Oを0.4秒握ってから」の2拍(R20でMOUSE層のPの下⌘も
+        //       廃止したため、右手の⌘はOに一本化。左手なら右Cmdが常に即時)。
         //     ・layer_6(書き込みモード)の入口もスラッシュ+Enterに連動変更(conditional_layers参照)。
         default_layer {
             bindings = <
@@ -365,12 +365,19 @@
         //   idx29(N)       = &trans → **&kp LC(V)**(Ctrl+V)。⌘⇧4をB位置へ移して空いた場所。
         //   2026-09-01: idx33(スラッシュ位置)=⌘Z(取り消し) / idx42(Del位置)=⌘⇧Z(やり直し)。
         //     レイヤー入口キーの位置でも、MOUSE層が開いている間はMOUSE層の定義が優先される
-        //     ので普通に割り当てられる(Pの下=⌘と同じ仕組み)。ボールが止まって0.7秒経つと
+        //     ので普通に割り当てられる。ボールが止まって0.7秒経つと
         //     MOUSE層が閉じ、同じキーが「/(長押しLayer1)」「RightAlt」に戻る点だけ注意。
+        //   2026-09-01(R20): idx21(Pの下) = &kp LGUI → **&mkp MB5(進む)** / idx5(Y) = &trans に戻す。
+        //     R16で「ボール中の⌘保持(⌘クリック)が消えるから」と撤回した配置だが、
+        //     R19でO長押し=⌘ができて前提が変わった(中山指示)。MOUSE層のidx8(O)は&trans=
+        //     Default層のalpha_holdに落ちるので、ボール操作中もOで⌘を作れる。
+        //     ⌘クリックの新しい形=「Oを握りながら狙う→クリック」(狙う時間が0.4秒を吸収)。
+        //     🔴 副作用: ボール直後にPの下を叩く誤爆が「⌘に化ける」→「進むに化ける」に変わった
+        //       (実害が出るのは進む履歴がある画面のみ。従来の未解決問題の形が変わっただけ)。
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &mkp MB5  &trans    &trans    &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &kp LGUI
+&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &mkp MB5
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &kp LC(V)  &kp LG(C)  &kp LG(V)  &kp LG(X)  &kp LG(Z)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &kp LG(LS(Z))
             >;
