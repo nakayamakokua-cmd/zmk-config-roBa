@@ -363,7 +363,13 @@
         //   idx28(B位置)   = ⌘⇧4(範囲スクショ)。idx29(N)から移設。
         //   idx6(U)        = ⌃⌘V を削除(使っていない)。
         //   idx29(N)       = &trans → **&kp LC(V)**(Ctrl+V)。⌘⇧4をB位置へ移して空いた場所。
-        //   2026-09-01: idx33(スラッシュ位置)=⌘Z(取り消し) / idx42(Del位置)=⌘⇧Z(やり直し)。
+        //   2026-09-01(R21): idx42(Del位置)の⌘⇧Zを idx9(P) へ移設。
+        //     🔴 実機で発覚した誤爆が理由: Del位置はボールに近く、親指がボールをかすった直後
+        //     0.7秒はMOUSE層が開いているため、RightAltのつもりが⌘⇧Zになる(中山が実機で遭遇。
+        //     BTT側の⌘⇧Zトリガーが反応して発覚)。Pなら「ボール直後にぱ行を打つ」時しか
+        //     衝突せず、実害がほぼ無い。⌘Z(スラッシュ)と同じ小指の列で覚えやすさも揃う。
+        //     Del位置はMOUSE層でも素通し=ボール直後でもRightAltが常に効く。
+        //   2026-09-01: idx33(スラッシュ位置)=⌘Z(取り消し) / idx9(P)=⌘⇧Z(やり直し)。
         //     レイヤー入口キーの位置でも、MOUSE層が開いている間はMOUSE層の定義が優先される
         //     ので普通に割り当てられる。ボールが止まって0.7秒経つと
         //     MOUSE層が閉じ、同じキーが「/(長押しLayer1)」「RightAlt」に戻る点だけ注意。
@@ -376,10 +382,10 @@
         //       (実害が出るのは進む履歴がある画面のみ。従来の未解決問題の形が変わっただけ)。
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &trans
+&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &kp LG(LS(Z))
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &mkp MB5
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &kp LC(V)  &kp LG(C)  &kp LG(V)  &kp LG(X)  &kp LG(Z)
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &kp LG(LS(Z))
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
             >;
         };
 
