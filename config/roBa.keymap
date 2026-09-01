@@ -1,6 +1,10 @@
-// 160 = tap-ms短縮(40→25ms)で1目盛りあたりの発火が2回→1回に減るぶんの補正。
-// 1発火の移動量 = この値 × trigger-period-ms(既定16) / 1000 = 2.56 → 従来の2回ぶんと同等。
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 160
+// 100 = 1目盛り=1単位に減量(2026-09-01 中山「少し動かしただけでめっちゃスクロールされる」対応。旧160=2単位)。
+// 1目盛りの出力 = int(この値 × trigger-period-ms(既定16) / 1000)。整数部しか出ない。
+//   端数(remainder)はtick間では持ち越されるが、目盛りごとの解放時に必ず破棄される
+//   (behavior_input_two_axis.c: k_work_cancel時に remainder=0。v0.3-branchソースで確認済)。
+// 🔴 つまり 63〜124 はすべて「1」で挙動が同じ。62以下は出力0に切り捨て=【無言で無反応】になる。
+//    1目盛り=1単位がこの仕組みの下限。これ以上減らしたければmacOS側のスクロール速度設定で絞る。
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 100
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
@@ -382,8 +386,10 @@
             >;
         };
 
-        // ENCODER: 無変換位置(Right Command)の長押し中。回転 = 音量上下。
+        // ENCODER: 左手下段いちばん内側(左Cmd)の長押し中。回転 = 音量上下。
         //   押し込みは Default 層で常時F13にしたので、この層では &trans で素通し(2026-08-14)。
+        //   2026-09-01: 回転方向を反転(中山「上から下で音量が上がるのは直感に反する」)。
+        //   &inc_dec_kp は <正方向, 逆方向> の並び。UP/DOWNを入れ替えた。
         ENCODER {
             bindings = <
 &trans  &trans  &trans  &trans  &trans                        &trans  &trans  &trans  &trans  &trans
@@ -392,7 +398,7 @@
 &trans  &trans  &trans  &trans  &trans  &trans        &trans  &trans                          &trans
             >;
 
-            sensor-bindings = <&inc_dec_kp C_VOLUME_UP C_VOLUME_DOWN>;
+            sensor-bindings = <&inc_dec_kp C_VOLUME_DOWN C_VOLUME_UP>;
         };
     };
 };
