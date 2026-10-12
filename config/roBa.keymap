@@ -281,11 +281,16 @@
         //       代償: ⌘コンボは「Oを0.4秒握ってから」の2拍(R20でMOUSE層のPの下⌘も
         //       廃止したため、右手の⌘はOに一本化。左手なら右Cmdが常に即時)。
         //     ・layer_6(書き込みモード)の入口もスラッシュ+Enterに連動変更(conditional_layers参照)。
+        //
+        //   2026-10-12(ラウンド23): 右手B位置(idx28) = &alpha_hold LEFT_SHIFT B(中山指示)。
+        //     タップ=B(従来どおり) / 0.4秒握る=Shift。Zと同じ tap-preferred(理由は alpha_hold)。
+        //     balanced にしない理由: 「ば/べ/ぼ」等で B↓→(左手)A↓→A↑→B↑ のロールが起き、Shift+A に化けるため。
+        //     MOUSE層(⌘⇧4)・layer_6(右手ブートローダー)の同じ位置は各層の定義が優先されるので影響なし。
         default_layer {
             bindings = <
 &kp Q                      &kp W           &kp E         &kp R     &kp T                                     &kp Y          &kp U        &lt 5 I  &alpha_hold LGUI O  &kp P
 &kp A                      &kp S           &kp D         &kp F     &kp G        &kp F13                      &kp MINUS      &kp H        &kp J    &kp K      &kp L    &lt 2 LC(SPACE)
-&alpha_hold LEFT_SHIFT Z   &kp X           &kp C         &kp V     &kp B        &kp COLON                    &kp B          &kp N        &kp M    &kp COMMA  &kp DOT  &lt 1 SLASH
+&alpha_hold LEFT_SHIFT Z   &kp X           &kp C         &kp V     &kp B        &kp COLON                    &alpha_hold LEFT_SHIFT B   &kp N        &kp M    &kp COMMA  &kp DOT  &lt 1 SLASH
 &kp LCTRL                  &kp LEFT_SHIFT  &kp LEFT_ALT  &kp RGUI  &lt 7 SPACE  &lt 8 LGUI                   &kp BACKSPACE  &lt 3 ENTER                                &kp RIGHT_ALT
             >;
 
@@ -295,6 +300,19 @@
         };
 
         // FUNCTION(1): 🔴 スラッシュ位置の長押し中(2026-09-01にDel位置長押しから移設)。
+        //   🔴 2026-10-12(ラウンド23)に右手上段・中段を再編(中山指示)。現行:
+        //   上段 = Claude Code 操作。U/I/Y は Ghostty の keybind(~/.config/ghostty/config)が
+        //          文字列に展開して流し込む(IMEを経由しない)。
+        //     Y=Alt+Y(→`claude-pick`+Enter・シェルのコマンド)  U=Alt+U(→`/exit`+Enter)
+        //     I=Alt+I(→`/effort`+Enter)  O=Alt+P(Claude Code内蔵のモデル選択)  P=Alt+C(→`/clear`+Enter・不変)
+        //   中段 = herdr のペイン操作(~/.config/herdr/config.toml の [keys])。
+        //     H=Alt+W(閉じる)  J=Alt+N(縦分割)  K=Alt+S(横分割)  L=Alt+Shift+N(新workspace)  Pの下=Alt+Z(ズーム)
+        //   下段: N=Ctrl+V  M=Ctrl+Shift(単体)  カンマ=Ctrl+U  ピリオド=Ctrl+J(不変)
+        //   R23で層から外れたもの: Y=Escape(→Space長押し+Q に同じEscが残る) /
+        //     U=Alt+R(herdrの最近のMD一覧) / I=Alt+F(herdrのファイルビューア)。
+        //     後2つは Del位置(素のRightAlt・押しっぱなし可)+R / +F で今も直接打てる
+        //     (Ghostty の macos-option-as-alt=true は左右どちらの⌥にも効く)。
+        //   ── 以下はR22までの経緯 ──
         //   2026-08-27に右手を全面再編(中山指示)。
         //   上段: Y=Escape  U=Alt+R  I=Alt+F  O=Alt+W  P=Alt+C(Ghostty経由で /clear)
         //   中段: J=Alt+N   K=Alt+S  L=Alt+Shift+N   Pの下=Alt+P(モデル選択)
@@ -312,8 +330,8 @@
         //   ・Ctrl+U はH位置から、Ctrl+J はU位置から移動(元の位置は素通しに戻した)。
         FUNCTION {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &kp LA(R)   &kp LA(F)      &kp LA(W)  &kp LA(C)
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans      &kp LA(N)      &kp LA(S)  &kp LA(LS(N))  &kp LA(P)
+&trans  &trans  &trans  &trans  &trans                      &kp LA(Y)   &kp LA(U)   &kp LA(I)      &kp LA(P)  &kp LA(C)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LA(W)   &kp LA(N)      &kp LA(S)  &kp LA(LS(N))  &kp LA(Z)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(V)   &kp LC(LSHFT)  &kp LC(U)  &kp LC(J)      &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                               &trans
             >;
@@ -382,12 +400,21 @@
         //     ⌘クリックの新しい形=「Oを握りながら狙う→クリック」(狙う時間が0.4秒を吸収)。
         //     🔴 副作用: ボール直後にPの下を叩く誤爆が「⌘に化ける」→「進むに化ける」に変わった
         //       (実害が出るのは進む履歴がある画面のみ。従来の未解決問題の形が変わっただけ)。
+        //   🔴 2026-10-12(R23): ⌘⇧Z(やり直し)を Del位置(idx42)→P(idx9) へ再移設。idx42 は &trans。
+        //     理由(中山報告): 音声入力の起動が「Del位置(RightAlt)の2回叩き」。ボールを触った直後
+        //     0.7秒はMOUSE層が開いたままなので、その2回叩きが ⌘⇧Z×2 に化けて音声が起動しない。
+        //     ターミナル(Ghostty+herdr)では ⌘Z/⌘⇧Z が「z/Z の文字」として流れ込む実害もあった
+        //     (Ghostty 1.3.1 の既定 super+z=undo / super+shift+z=redo は戻すものが無いと素通しになる)
+        //     → Ghostty側で super+z / super+shift+z を ignore にした(~/.config/ghostty/config)。
+        //     R22で許容した残置リスク(ボール直後のRightAltがやり直しに化ける)を、音声起動との
+        //     衝突という実害が出たので構造で消した。Del位置はどの層でも RightAlt に固定。
+        //     idx9(P)は R21 で一度使った位置。O(idx8)は &trans=Default層の alpha_hold(⌘)のまま。
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &trans
+&trans  &trans  &trans  &trans  &trans                      &trans  &trans    &trans    &trans     &kp LG(LS(Z))
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(V))  &mkp MB4  &mkp MB1  &kp LG(A)  &mkp MB2  &mkp MB5
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LG(LS(NUMBER_4))  &kp LC(V)  &kp LG(C)  &kp LG(V)  &kp LG(X)  &kp LG(Z)
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &kp LG(LS(Z))
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                &trans
             >;
         };
 
