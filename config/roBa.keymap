@@ -304,7 +304,9 @@
         //   上段 = Esc ＋ Claude Code 操作。U/I/伸ばし棒位置の Alt+x は Ghostty の keybind
         //          (~/.config/ghostty/config)が文字列に展開して流し込む(IMEを経由しない)。
         //     Y=Escape(不変・R23b で戻した)  U=Alt+U(→`/exit`+Enter)
-        //     I=Alt+I(→`/effort`+Enter)  O=Alt+P(Claude Code内蔵のモデル選択)  P=Alt+C(→`/clear`+Enter・不変)
+        //     I=Alt+C(→`/clear`+Enter)  O=Alt+P(Claude Code内蔵のモデル選択)  P=Alt+I(→`/effort`+Enter)
+        //     🔴 2026-10-13(R23c・中山指示): /clear と /effort の位置を入れ替えた(I⇔P)。
+        //        R22までの「P=/clear」の指の記憶は変わる。Ghostty 側の alt+c / alt+i は不変。
         //   中段 = herdr のペイン操作(~/.config/herdr/config.toml の [keys])。
         //     伸ばし棒位置(idx16)=Alt+Y(→`claude-pick`+Enter・シェルのコマンド)
         //     H=Alt+W(閉じる)  J=Alt+N(縦分割)  K=Alt+S(横分割)  L=Alt+Shift+N(新workspace)  Pの下=Alt+Z(ズーム)
@@ -333,7 +335,7 @@
         //   ・Ctrl+U はH位置から、Ctrl+J はU位置から移動(元の位置は素通しに戻した)。
         FUNCTION {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &kp LA(U)   &kp LA(I)      &kp LA(P)  &kp LA(C)
+&trans  &trans  &trans  &trans  &trans                      &kp ESCAPE  &kp LA(U)   &kp LA(C)      &kp LA(P)  &kp LA(I)
 &trans  &trans  &trans  &trans  &trans  &trans      &kp LA(Y)  &kp LA(W)   &kp LA(N)      &kp LA(S)  &kp LA(LS(N))  &kp LA(Z)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(V)   &kp LC(LSHFT)  &kp LC(U)  &kp LC(J)      &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                               &trans
